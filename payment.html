@@ -1,39 +1,83 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Instastrategix Payment</title>
-  <script src="https://js.stripe.com/v3/"></script>
+    <meta charset="UTF-8">
+    <title>Book Your Package | Instastrategix</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Stripe -->
+    <script src="https://js.stripe.com/v3/"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="payment.css">
 </head>
 <body>
 
-<h2>Select Your Package</h2>
+<section class="payment-hero">
+    <div class="overlay"></div>
+    <div class="container">
+        <h1>Choose Your Growth Package</h1>
+        <p>Strategic digital marketing systems built for measurable revenue growth.</p>
+    </div>
+</section>
 
-<button onclick="pay('starter')">Starter - $499</button>
-<button onclick="pay('growth')">Growth - $999</button>
-<button onclick="pay('scale')">Scale - $1999</button>
+<section class="pricing-section">
+    <div class="container pricing-grid">
 
-<script>
+        <!-- Starter -->
+        <div class="pricing-card">
+            <h3>Starter</h3>
+            <div class="price">$499</div>
+            <ul>
+                <li>SEO Foundation Setup</li>
+                <li>Keyword Strategy</li>
+                <li>On-Page Optimization</li>
+                <li>1 Month Support</li>
+            </ul>
+            <button onclick="startPayment('starter')" class="btn-primary">
+                Get Started
+            </button>
+        </div>
 
-const stripe = Stripe("pk_test_YOUR_PUBLISHABLE_KEY");
+        <!-- Growth -->
+        <div class="pricing-card featured">
+            <div class="badge">Most Popular</div>
+            <h3>Growth</h3>
+            <div class="price">$999</div>
+            <ul>
+                <li>Advanced SEO</li>
+                <li>Paid Ads Setup</li>
+                <li>Content Strategy</li>
+                <li>Conversion Optimization</li>
+                <li>3 Months Support</li>
+            </ul>
+            <button onclick="startPayment('growth')" class="btn-primary">
+                Scale Now
+            </button>
+        </div>
 
-async function pay(packageType) {
+        <!-- Scale -->
+        <div class="pricing-card">
+            <h3>Scale</h3>
+            <div class="price">$1999</div>
+            <ul>
+                <li>Full Marketing System</li>
+                <li>Ads + SEO + Social</li>
+                <li>Authority Content</li>
+                <li>Funnel Optimization</li>
+                <li>6 Months Support</li>
+            </ul>
+            <button onclick="startPayment('scale')" class="btn-primary">
+                Dominate Market
+            </button>
+        </div>
 
-  const response = await fetch("http://localhost:4242/create-checkout-session", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ packageType })
-  });
+    </div>
+</section>
 
-  const session = await response.json();
-
-  stripe.redirectToCheckout({
-    sessionId: session.id
-  });
-}
-
-</script>
-
+<script src="payment.js"></script>
 </body>
 </html>

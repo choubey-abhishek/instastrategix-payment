@@ -1,29 +1,58 @@
-const stripe = Stripe("pk_test_YOUR_PUBLISHABLE_KEY");
+const stripe = Stripe("pk_live_YOUR_PUBLISHABLE_KEY");
 
-async function startPayment(packageType) {
+const form = document.getElementById("payment-form");
+const packageSelect = document.getElementById("package");
+const summaryPackage = document.getElementById("summary-package");
+const summaryPrice = document.getElementById("summary-price");
+const loading = document.getElementById("loading");
+
+const prices = {
+    starter: 499,
+    growth: 999,
+    scale: 1999
+};
+
+packageSelect.addEventListener("change", () => {
+    const selected = packageSelect.value;
+
+    if (prices[selected]) {
+        summaryPackage.innerText = selected.toUpperCase() + " Package";
+        summaryPrice.innerText = "$" + prices[selected];
+    } else {
+        summaryPackage.innerText = "No package selected";
+        summaryPrice.innerText = "$0";
+    }
+});
+
+form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    loading.classList.remove("hidden");
+
+    const packageType = packageSelect.value;
+
+    if (!packageType) {
+        alert("Please select a package");
+        loading.classList.add("hidden");
+        return;
+    }
 
     try {
-        const response = await fetch("http://localhost:4242/create-checkout-session", {
+        const response = await fetch("https://your-backend-url.onrender.com/create-checkout-session", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ packageType })
         });
 
         const session = await response.json();
 
-        if (session.id) {
-            stripe.redirectToCheckout({
-                sessionId: session.id
-            });
-        } else {
-            alert("Payment error. Try again.");
-        }
+        await stripe.redirectToCheckout({
+            sessionId: session.id
+        });
 
     } catch (error) {
-        console.error("Payment error:", error);
-        alert("Server error. Please try later.");
+        alert("Payment error. Try again.");
+        console.error(error);
+        loading.classList.add("hidden");
     }
-}
-
+});

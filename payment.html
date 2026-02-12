@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Instastrategix Payment</title>
+  <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+
+<h2>Select Your Package</h2>
+
+<button onclick="pay('starter')">Starter - $499</button>
+<button onclick="pay('growth')">Growth - $999</button>
+<button onclick="pay('scale')">Scale - $1999</button>
+
+<script>
+
+const stripe = Stripe("pk_test_YOUR_PUBLISHABLE_KEY");
+
+async function pay(packageType) {
+
+  const response = await fetch("http://localhost:4242/create-checkout-session", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({ packageType })
+  });
+
+  const session = await response.json();
+
+  stripe.redirectToCheckout({
+    sessionId: session.id
+  });
+}
+
+</script>
+
+</body>
+</html>

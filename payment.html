@@ -1,73 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Checkout | Instastrategix</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
-<script src="https://js.stripe.com/v3/"></script>
-<link rel="stylesheet" href="payment.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pay for Services - Instastrategix</title>
+  
+  <!-- Link your main site CSS first (adjust path if needed, e.g., css/style.css) -->
+  <link rel="stylesheet" href="css/style.css">
+  
+  <!-- Custom payment styles -->
+  <link rel="stylesheet" href="css/payment.css">
 </head>
 <body>
+  <!-- COPY YOUR EXISTING HEADER/NAV HERE from index.html for consistency -->
+  <!-- Example placeholder - replace with your actual header -->
+  <header>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="contact-us.html">Contact</a>
+      <a href="payment.html">Client Payments</a> <!-- Add this link to your nav on all pages -->
+    </nav>
+  </header>
 
-<section class="checkout-wrapper">
-    <div class="container checkout-grid">
+  <main class="container"> <!-- Use your site's container class if it has one -->
+    <h1>Select Services & Pay Securely</h1>
+    <p>Choose your monthly services (customize prices as needed):</p>
 
-        <!-- LEFT: FORM -->
-        <div class="checkout-form">
-            <h2>Client Information</h2>
-
-            <form id="payment-form">
-
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="name" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Email Address</label>
-                    <input type="email" id="email" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Business Name</label>
-                    <input type="text" id="business">
-                </div>
-
-                <div class="form-group">
-                    <label>Select Package</label>
-                    <select id="package" required>
-                        <option value="">Choose Package</option>
-                        <option value="starter">Starter - $499</option>
-                        <option value="growth">Growth - $999</option>
-                        <option value="scale">Scale - $1999</option>
-                    </select>
-                </div>
-
-                <button type="submit" class="btn-primary">
-                    Proceed to Secure Payment
-                </button>
-
-                <div id="loading" class="loading hidden">
-                    Processing...
-                </div>
-
-            </form>
-        </div>
-
-        <!-- RIGHT: SUMMARY -->
-        <div class="order-summary">
-            <h3>Order Summary</h3>
-            <p id="summary-package">No package selected</p>
-            <p id="summary-price">$0</p>
-            <hr>
-            <p class="secure-text">🔒 Secured by Stripe</p>
-        </div>
-
+    <div class="service-grid">
+      <div class="service-card">
+        <label><input type="checkbox" data-price="20000"> SEO Package - ₹20,000/month</label>
+      </div>
+      <div class="service-card">
+        <label><input type="checkbox" data-price="15000"> Paid Advertising - ₹15,000/month</label>
+      </div>
+      <div class="service-card">
+        <label><input type="checkbox" data-price="10000"> Social Media Marketing - ₹10,000/month</label>
+      </div>
+      <div class="service-card">
+        <label><input type="checkbox" data-price="12000"> Content & Brand Strategy - ₹12,000/month</label>
+      </div>
     </div>
-</section>
 
-<script src="payment.js"></script>
+    <div class="total">Total: ₹<span id="total-amount">0</span></div>
+
+    <h2>Your Details</h2>
+    <form id="details-form">
+      <input type="text" id="name" placeholder="Full Name" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="tel" id="phone" placeholder="Phone (10 digits)" required><br>
+    </form>
+
+    <button id="pay-btn" disabled>Pay Now</button>
+  </main>
+
+  <!-- Razorpay Checkout -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  
+  <!-- Custom JS -->
+  <script src="js/payment.js" defer></script>
 </body>
 </html>

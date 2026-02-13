@@ -1,58 +1,72 @@
-const stripe = Stripe("pk_live_YOUR_PUBLISHABLE_KEY");
+document.addEventListener('DOMContentLoaded', () => {
+  const services = document.querySelectorAll('input[type="checkbox"]');
+  const totalSpan = document.getElementById('total-amount');
+  const payBtn = document.getElementById('pay-btn');
+  let total = 0;
 
-const form = document.getElementById("payment-form");
-const packageSelect = document.getElementById("package");
-const summaryPackage = document.getElementById("summary-package");
-const summaryPrice = document.getElementById("summary-price");
-const loading = document.getElementById("loading");
+  services.forEach(service => {
+    service.addEventListener('change', () => {
+      total = 0;
+      services.forEach(s => {
+        if (s.checked) total += parseInt(s.dataset.price);
+      });
+      totalSpan.textContent = total;
+      payBtn.disabled = total === 0;
+    });
+  });
 
-const prices = {
-    starter: 499,
-    growth: 999,
-    scale: 1999
-};
+  payBtn.addEventListener('click', async () => {
+    const name = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
 
-packageSelect.addEventListener("change", () => {
-    const selected = packageSelect.value;
-
-    if (prices[selected]) {
-        summaryPackage.innerText = selected.toUpperCase() + " Package";
-        summaryPrice.innerText = "$" + prices[selected];
-    } else {
-        summaryPackage.innerText = "No package selected";
-        summaryPrice.innerText = "$0";
-    }
-});
-
-form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    loading.classList.remove("hidden");
-
-    const packageType = packageSelect.value;
-
-    if (!packageType) {
-        alert("Please select a package");
-        loading.classList.add("hidden");
-        return;
+    if (!name || !email || !phone || total === 0) {
+      alert('Please fill all details and select at least one service');
+      return;
     }
 
+    // Create order via your backend
     try {
-        const response = await fetch("https://your-backend-url.onrender.com/create-checkout-session", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ packageType })
-        });
+      const response = await fetch('https://your-backend-url.onrender.com/create-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: total * 100 }) // in paise
+      });
+      const data = await response.json();
 
-        const session = await response.json();
+      const options = {
+        key: 'YOUR_RAZORPAY_KEY_ID', // Test or live
+        amount: total * 100,
+        currency: 'INR',
+        name: 'Instastrategix',
+        description: 'Payment for Digital Marketing Services',
+        order_id: data.order_id,
+        handler: async (resp) => {
+          // Verify payment
+          const verifyRes = await fetch('https://your-backend-url.onrender.com/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              order_id: resp.razorpay_order_id,
+              payment_id: resp.razorpay_payment_id,
+              signature: resp.razorpay_signature
+            })
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            window.location.href = 'success.html';
+          } else {
+            window.location.href = 'failed.html';
+          }
+        },
+        prefill: { name, email, contact: phone },
+        theme: { color: '#3399cc' }
+      };
 
-        await stripe.redirectToCheckout({
-            sessionId: session.id
-        });
-
-    } catch (error) {
-        alert("Payment error. Try again.");
-        console.error(error);
-        loading.classList.add("hidden");
+      const rzp = new Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      alert('Payment initiation failed. Try again.');
     }
+  });
 });
